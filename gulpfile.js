@@ -1,39 +1,40 @@
 const
+	{ fetch } = require('./'),
 	fs = require('fs'),
 	path = require('path'),
 	gulp = require('gulp'),
 	plumber = require('gulp-plumber'),
-	sass = require('gulp-sass'),
-	cleanCSS = require('gulp-clean-css'),
-	closureCompiler = require('google-closure-compiler').gulp(),
-	browserSync = require('browser-sync').create();
+	uglify = require('gulp-uglify');
 
-gulp.task('css', done => {
-	gulp.src('src/scss/**/*.scss')
-		.pipe(plumber())
-		.pipe(sass())
-		.pipe(cleanCSS())
-		.pipe(gulp.dest('dist/css'))
-		.on('end', () => done())
-		.pipe(browserSync.stream());
+gulp.task('AbortController', done => {
+	let fn = path.join(__dirname, 'dist', 'abort-controller.js');
+	if (fs.existsSync(fn))
+		done();
+	else
+		gulp.src(path.join(__dirname, 'node_modules', 'abort-controller', 'dist', 'abort-controller.js'))
+			.pipe(gulp.dest('dist'))
+			.on('end', () => done())
 });
-gulp.task('js', done => {
-	let task = gulp.src([
-		'src/js/FILENAME'
-	]).pipe(plumber());
-	if (process.env.COMPILER != 'false')
-		task = task.pipe(closureCompiler({
-			compilation_level: 'SIMPLE',
-			js_output_file: 'FILENAME'
-		}, { platform: ['native', 'java', 'javascript'] }));
-	task.pipe(gulp.dest('dist/js')).on('end', () => done()).pipe(browserSync.stream());
+gulp.task('polyfill', done => {
+	let fn = path.join(__dirname, 'dist', 'polyfill.js'),
+		dn = path.dirname(fn);
+	if (fs.existsSync(fn))
+		done();
+	else
+		fetch('https://polyfill.io/v3/polyfill.min.js?features=AbortController', {
+			headers: { 'user-agent': 'Mozilla/1.22 (compatible; MSIE 10.0; Windows 3.1)' }
+		}).then(res => res.text()).then(body => {
+			if (!fs.existsSync(dn))
+				fs.mkdirSync(dn, { recursive: true });
+			fs.writeFile(fn, body, err => {
+				if (err)
+					return console.log(err);
+				gulp.src(fn)
+					.pipe(plumber())
+					.pipe(uglify())
+					.pipe(gulp.dest('dist'))
+					.on('end', () => done())
+			});
+		}).catch(() => done());
 });
-gulp.task('html', async () => {
-	if (process.env.DEV != 'true')
-		return;
-	browserSync.init({ server: './' });
-	gulp.watch('src/scss/**/*.scss', gulp.series('css'));
-	gulp.watch('src/js/**/*.js', gulp.series('js'));
-	gulp.watch('*.html').on('change', () => browserSync.reload());
-});
-gulp.task('default', gulp.series('css', 'js', 'html'));
+gulp.task('default', gulp.series('AbortController', 'polyfill'));

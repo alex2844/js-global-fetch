@@ -1,23 +1,32 @@
 {
-	"name": "NAME",
-	"version": "1.0.0",
-	"description": "",
-	"main": "FILENAME",
+	"name": "js-global-fetch",
+	"version": "1.1.2",
+	"description": "Universal Fetch API, FormData, AbortController, CorsProxy for Nodejs and Browsers",
+	"main": "globalFetch.js",
 	"bin": {
-		"NAME": "FILENAME"
+		"globalFetch": "globalFetch.js"
 	},
 	"scripts": {
 		"build": "npx gulp",
 		"test": "node test.js",
-		"start": "node FILENAME"
+		"start": "node globalFetch.js"
 	},
 	"files": [
 		"dist/",
-		"FILENAME"
+		"globalFetch.js"
 	],
-	"dependencies": {},
-	"devDependencies": {},
-	"repository": "https://github.com/alex2844/NAME.git",
+	"dependencies": {
+		"event-target-shim": "^5.0.1",
+		"form-data": "^3.0.0",
+		"node-fetch": "^2.6.0"
+	},
+	"devDependencies": {
+		"abort-controller": "^3.0.0",
+		"gulp": "^4.0.2",
+		"gulp-plumber": "^1.2.1",
+		"gulp-uglify": "^3.0.2"
+	},
+	"repository": "https://github.com/alex2844/js-global-fetch.git",
 	"author": {
 		"name": "Alex Smith",
 		"email": "alex.smith2844@gmail.com",

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="globalFetch Test" />
+	<meta name="author" content="Alex Smith, https://me.qwedl.com/"/>
+	<title>globalFetch Demo</title>
+	<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon" />
+	<link href="https://alex2844.github.io/qad-cmf/dist/css/tablet_dark.css" rel="stylesheet" />
+</head>
+<body>
+	<div class="content">
+		<header>
+			<h1>globalFetch</h1>
+			<button><img src="https://fonts.gstatic.com/s/i/materialicons/autorenew/v4/24px.svg" /></button>
+		</header>
+		<pre><code class="prettyprint"></code></pre>
+	</div>
+	<style>
+		pre {
+			background: #283142;
+			color: #eceff1;
+		}
+		header button:not([hidden]) img { animation: spinner .8s linear infinite }
+		@keyframes spinner {
+			100% { transform: rotate(360deg) }
+		}
+	</style>
+	<script>
+		window.onerror = function(msg, url, line, col, error) {
+			var res = (
+				((typeof(line) == 'undefined') && (typeof(col) == 'undefined'))
+				? [msg, url, error].join('; ')
+				: (msg+' ('+line+':'+col+':'+(url ? url.split('/').slice(-1).join().split('_')[0] : '')+')')
+			);
+			if (res != 'Script error. (0:0:)')
+				alert(res);
+			return true;
+		}
+	</script>
+	<script src="./test.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?skin=desert"></script>
+</body>
+</html>

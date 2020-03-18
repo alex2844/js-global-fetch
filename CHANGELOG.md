@@ -10,11 +10,9 @@ Security in case of vulnerabilities. (Безопасность в случае �
 
 ## [Unreleased]
 
-## [0.0.1] - 2020-03-18
+## [1.2.0] - 2020-03-18
 ### Added
 - Init
 
-[Unreleased]: ../../compare/v1.0.0...HEAD
-[1.0.0]: ../../compare/v0.1.0...v1.0.0
-[0.1.0]: ../../compare/v0.0.1...v0.1.0
-[0.0.1]: ../../releases/tag/v0.0.1
+[Unreleased]: ../../compare/v1.2.0...HEAD
+[1.2.0]: ../../releases/tag/v1.2.0
