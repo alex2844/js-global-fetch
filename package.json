@@ -1,0 +1,27 @@
+{
+	"name": "NAME",
+	"version": "1.0.0",
+	"description": "",
+	"main": "FILENAME",
+	"bin": {
+		"NAME": "FILENAME"
+	},
+	"scripts": {
+		"build": "npx gulp",
+		"test": "node test.js",
+		"start": "node FILENAME"
+	},
+	"files": [
+		"dist/",
+		"FILENAME"
+	],
+	"dependencies": {},
+	"devDependencies": {},
+	"repository": "https://github.com/alex2844/NAME.git",
+	"author": {
+		"name": "Alex Smith",
+		"email": "alex.smith2844@gmail.com",
+		"website": "https://me.qwedl.com/",
+		"github": "https://github.com/alex2844"
+	}
+}
