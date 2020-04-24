@@ -33,7 +33,7 @@ self.addEventListener('fetch', async event => {
 								headers[h[0]] = h[1];
 						}
 						for (let h of req.headers.entries()) {
-							if (h[0].match(/^cors-/i) && (h[0] = h[0].replace(/^cors-/i, ''))) {
+							if (h[0].match(/^cors-/i) && ((h[0] = h[0].replace(/^cors-/i, '')) != 'cache')) {
 								if (h[1] && (h[1] != 'null'))
 									headers[h[0]] = h[1];
 								else
@@ -56,6 +56,10 @@ self.addEventListener('fetch', async event => {
 				if (req.headers.get('Access-control-request-headers'))
 					res.headers.set('Access-Control-Allow-Headers', req.headers.get('Access-control-request-headers'));
 				res.headers.set('Access-Control-Expose-Headers', '*');
+			}
+			if (req.headers.get('Cors-Cache')) {
+				res.headers.set('Cache-control', 'public');
+				res.headers.set('Expires', new Date(Date.now() + parseInt(req.headers.get('Cors-Cache'))).toUTCString());
 			}
 		} catch (e) {
 			res = new Response((e.stack || e), { status: 500 });

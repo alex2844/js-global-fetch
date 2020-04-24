@@ -20,6 +20,7 @@ npm install js-global-fetch
 const { fetch } = require('js-global-fetch');
 fetch('https://httpbin.org/get', {
     headers: {
+		'Cors-Cache': 60*60*24*1000,
         'Cors-Referer': 'https://alex2844.github.io/js-global-fetch/',
         'Cors-User-Agent': 'globalFetch'
     }
