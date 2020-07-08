@@ -1,0 +1,14 @@
+{
+	"manifest_version": 2,
+	"version": "1.2.0",
+	"name": "CorsProxy",
+	"description": "",
+	"permissions": [ "proxy", "tabs", "downloads", "cookies", "storage", "file://*/*", "<all_urls>", "webRequest", "webRequestBlocking", "contextMenus" ],
+	"icons": { "48": "icon.png" },
+	"homepage_url": "https://github.com/alex2844/js-global-fetch",
+	"browser_action": {},
+	"background": {
+		"scripts": [ "background.js" ]
+	},
+	"web_accessible_resources": [ "manifest.json" ]
+}

@@ -13,6 +13,7 @@ Security in case of vulnerabilities. (Безопасность в случае �
 ## [1.2.1] - 2020-04-24
 ### Added
 - Cors-Cache (worker)
+- Add chrome extension
 
 ## [1.0.0] - 2020-03-18
 ### Added
