@@ -1,6 +1,6 @@
 # globalFetch
 
-[![Version](https://img.shields.io/npm/v/js-global-fetch.svg)](https://www.npmjs.org/package/js-global-fetch)
+[![Version](https://img.shields.io/npm/v/js-global-fetch.svg)](https://www.npmjs.org/package/js-global-fetch) [![Extension](https://www.google.com/images/icons/product/chrome_web_store-32.png)](https://alex2844.github.io/js-global-fetch/index.html?extension)
 
 ## Universal Fetch API, FormData, AbortController, CorsProxy for Nodejs and Browsers
 
@@ -13,6 +13,10 @@ npm install js-global-fetch
 ``` html
 <script src="https://alex2844.github.io/js-global-fetch/dist/polyfill.js"></script>
 ```
+###### extension
+- chrome://extensions/
+- Dev mode on
+- 'Load unpacked extension' button and select the unzipped folder for your extension to install it.
 
 #### Usage
 ###### Get json
