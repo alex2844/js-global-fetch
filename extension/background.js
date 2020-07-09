@@ -74,7 +74,9 @@ chrome.storage.local.get({
 				return { name: k, value: h.value };
 			}
 			return h;
-		}).filter(h => (h.value && (h.value != 'null'))).concat(Object.entries(JSON.parse(Object.fromEntries(new URLSearchParams(url)).corsProxy || '{}')).map(h => ({
+		}).filter(h => (h.value && (h.value != 'null'))).concat(Object.entries(
+			JSON.parse(Object.fromEntries(new URLSearchParams('?'+url.split('?')[1])).corsProxy || '{}')
+		).map(h => ({
 			name: h[0], value: h[1]
 		})))
 	}), {
