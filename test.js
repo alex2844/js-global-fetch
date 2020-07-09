@@ -152,6 +152,8 @@ function load() {
 			worker = sessionStorage.getItem('worker');
 		else if ((worker = prompt('Worker url')) != null)
 			sessionStorage.setItem('worker', worker);
+		if (worker === null)
+			worker = '';
 		tests_();
 	}else{
 		if (worker = process.env.WORKER)
