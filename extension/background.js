@@ -65,7 +65,7 @@ chrome.storage.local.get({
 			], { type: 'text/plain;charset=utf-8' }))
 		})))
 	});
-	chrome.webRequest.onBeforeSendHeaders.addListener(({ requestHeaders }) => (!ps.enabled ? {} : {
+	chrome.webRequest.onBeforeSendHeaders.addListener(({ url, requestHeaders }) => (!ps.enabled ? {} : {
 		requestHeaders: requestHeaders.map(h => {
 			let i, k;
 			if (h.name.match(/^cors-/i) && (k = h.name.replace(/^cors-/i, ''))) {
@@ -74,7 +74,9 @@ chrome.storage.local.get({
 				return { name: k, value: h.value };
 			}
 			return h;
-		}).filter(h => (h.value && (h.value != 'null')))
+		}).filter(h => (h.value && (h.value != 'null'))).concat(Object.entries(JSON.parse(Object.fromEntries(new URLSearchParams(url)).corsProxy || '{}')).map(h => ({
+			name: h[0], value: h[1]
+		})))
 	}), {
 		urls: [	'<all_urls>' ]
 	}, [
