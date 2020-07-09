@@ -7,7 +7,7 @@ var fn = {
 };
 var tests = {
 	corsWorker: function() {
-		return fetch(worker+'https://api.qwedl.com/ip.php?c=1', {
+		return fetch(worker+'https://api.qwedl.com/ip.php?c=1&no_cors', {
 			headers: {
 				'Content-type': 'application/json',
 				'Cors-Referer': null,
@@ -35,7 +35,7 @@ var tests = {
 		else
 			file = require('fs').createReadStream('package.json');
 		data.append('file', file);
-		return fetch(worker+'https://api.qwedl.com/ip.php?format=json', {
+		return fetch(worker+'https://api.qwedl.com/ip.php?format=json&no_cors', {
 			method: 'POST',
 			body: data
 		}).then(function(res) {
@@ -51,7 +51,7 @@ var tests = {
 		});
 	},
 	corsForm: function(e) {
-		return fetch(worker+"https://api.qwedl.com/ip.php?format=json", {
+		return fetch(worker+'https://api.qwedl.com/ip.php?format=json&no_cors', {
 			body: 'asd1=qwe&asd2=qwe',
 			method: 'POST',
 			headers: { 'content-type': 'application/x-www-form-urlencoded' }
@@ -64,22 +64,22 @@ var tests = {
 		});
 	},
 	corsOk: function() {
-		return fetch(worker).then(function(res) {
+		return (!worker ? Promise.resolve('worker not found') : fetch(worker).then(function(res) {
 			return res.text();
 		}).then(function(body) {
 			return ((body == worker+'<url>') && 'ok');
 		}).catch(function(err) {
 			return 'Error: '+err.message;
-		});
+		}));
 	},
 	corsErr: function() {
-		return fetch(worker+'/iscorsneeded').then(function(res) {
+		return (!worker ? Promise.resolve('worker not found') : fetch(worker+'/iscorsneeded').then(function(res) {
 			return res.text();
 		}).then(function(body) {
 			return ((body == (('document' in self) ? 'yes' : 'no')) && 'ok');
 		}).catch(function(err) {
 			return (((err.message == 'Failed to fetch') || (err.message.indexOf('is not allowed by Access-Control-Allow-Origin.') > -1)) ? 'ok' : 'Error: '+err.message);
-		});
+		}));
 	},
 	corsVideo: function() {
 		return fetch(worker+'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', {
@@ -173,17 +173,14 @@ function tests_() {
 	var _tests = {};
 	for (var k in tests) {
 		(function(k) {
-			if (worker || (k.slice(0, 4) != 'cors'))
-				tests[k]().then(function(res) {
-					--count;
-					_tests[k] = res;
-					log({ worker, fn, _tests });
-				});
-			else{
+			tests[k]().then(function(res) {
 				--count;
-				_tests[k] = 'worker not found';
-				log({ fn, _tests });
-			}
+				_tests[k] = res;
+				log({
+					worker: (worker || (('document' in self) && document.documentElement.dataset.corsProxy && JSON.parse(document.documentElement.dataset.corsProxy))),
+					fn, _tests
+				});
+			});
 		})(k);
 	}
 }

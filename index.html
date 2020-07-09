@@ -48,25 +48,21 @@
 				fetch('https://api.github.com/repos/alex2844/js-global-fetch/contents/extension?ref=master').then(function(e) {
 					return e.json();
 				}).then(function(d) {
-					Promise.all(
-						d.map(function(f) {
-							return fetch(f.git_url).then(function(e) {
-								return e.json();
-							}).then(function(e) {
-								if (f.name == 'manifest.json')
-									corsProxy.update = JSON.parse(atob(e.content)).version;
-								return {
-									path: f.name,
-									content: e.content
-								};
-							})
+					Promise.all(d.map(function(f) {
+						return fetch(f.git_url).then(function(e) {
+							return e.json();
+						}).then(function(e) {
+							if (f.name == 'manifest.json')
+								corsProxy.update = JSON.parse(atob(e.content)).version;
+							return {
+								path: f.name,
+								content: e.content
+							};
 						})
-					).then(function(contents) {
-						console.log(corsProxy);
+					})).then(function(contents) {
 						if (corsProxy.install && (corsProxy.install.version == corsProxy.update)) {
-							document.querySelector('code').innerHTML = JSON.stringify({
-								corsProxy: { install: corsProxy.install }
-							}, null, '\t');
+							delete corsProxy.update;
+							document.querySelector('code').innerHTML = JSON.stringify({ corsProxy }, null, '\t');
 							document.querySelector('.content header button').hidden = true;
 							PR.prettyPrint(document.querySelector('code').classList.remove('prettyprinted'));
 						}else{
