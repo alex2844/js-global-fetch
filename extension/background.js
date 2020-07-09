@@ -2,6 +2,10 @@ chrome.storage.local.get({
 	enabled: true,
 	antizapret: false
 }, ps => {
+	let headerFind = (headers, key, value) => {
+		let o = headers.find(({ name }) => name.match(new RegExp(key, 'i')));
+		return (o ? o.value : (value || null));
+	}
 	let proxy = () => chrome.proxy.settings.set({
 		value: (!ps.antizapret ? { mode: 'system' } : {
 			mode: 'pac_script',
@@ -76,12 +80,13 @@ chrome.storage.local.get({
 	}, [
 		'blocking', 'requestHeaders', 'extraHeaders'
 	]);
-	chrome.webRequest.onHeadersReceived.addListener(({ responseHeaders }) => ((!ps.enabled || responseHeaders.find(({ name }) => name.match(/^access-control-allow-origin/i))) ? {} : {
+	chrome.webRequest.onHeadersReceived.addListener(({ responseHeaders }) => (!ps.enabled ? {} : {
 		responseHeaders: responseHeaders.concat([
-			{ name: 'Access-Control-Allow-Origin', value: '*' },
-			{ name: 'Access-Control-Allow-Methods', value: '*' },
-			{ name: 'Access-Control-Allow-Headers', value: '*' },
-			{ name: 'Access-Control-Expose-Headers', value: '*' }
+			{ name: 'Access-Control-Allow-Origin', value: headerFind(responseHeaders, 'access-control-allow-origin', '*') },
+			{ name: 'Access-Control-Allow-Methods', value: headerFind(responseHeaders, 'access-control-allow-methods', '*') },
+			{ name: 'Access-Control-Allow-Headers', value: headerFind(responseHeaders, 'access-control-allow-headers', '*') },
+			{ name: 'Access-Control-Expose-Headers', value: '*' },
+			{ name: 'Access-Control-Allow-Credentials', value: 'true' }
 		])
 	}), {
 		urls: [	'<all_urls>' ]
