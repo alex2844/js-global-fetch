@@ -71,10 +71,13 @@ chrome.storage.local.get({
 			if (h.name.match(/^cors-/i) && (k = h.name.replace(/^cors-/i, ''))) {
 				if ((i = requestHeaders.findIndex(h_ => h_.name.match(new RegExp('^'+k+'$', 'i')))) > -1)
 					requestHeaders[i].value = null;
-				return { name: k, value: h.value };
+				return { name: k, value: ((h.value == 'null') ? h.value : null) };
 			}
 			return h;
-		}).filter(h => (h.value && (h.value != 'null'))).concat(Object.entries(
+		})
+		// .filter(h => (h.value && (h.value != 'null')))
+		.filter(Boolean)
+		.concat(Object.entries(
 			JSON.parse(Object.fromEntries(new URLSearchParams('?'+url.split('?')[1])).corsProxy || '{}')
 		).map(h => ({
 			name: h[0], value: h[1]
