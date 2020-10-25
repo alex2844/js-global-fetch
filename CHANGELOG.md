@@ -10,6 +10,10 @@ Security in case of vulnerabilities. (Безопасность в случае �
 
 ## [Unreleased]
 
+## [1.5.0] - 2020-10-25
+### Added
+- Support Google Apps Script
+
 ## [1.2.1] - 2020-04-24
 ### Added
 - Cors-Cache (worker)
@@ -19,6 +23,7 @@ Security in case of vulnerabilities. (Безопасность в случае �
 ### Added
 - Init
 
-[Unreleased]: ../../compare/v1.2.1...HEAD
+[Unreleased]: ../../compare/v1.5.0...HEAD
+[1.5.0]: ../../releases/tag/v1.5.0
 [1.2.1]: ../../releases/tag/v1.2.1
 [1.0.0]: ../../releases/tag/v1.0.0
