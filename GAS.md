@@ -17,6 +17,20 @@
 	}
 }
 ```
+*appsscript.json*
+``` json
+{
+	"timeZone": "Asia/Yekaterinburg",
+	"dependencies": {
+	},
+	"webapp": {
+		"access": "MYSELF",
+		"executeAs": "USER_DEPLOYING"
+	},
+	"exceptionLogging": "STACKDRIVER",
+	"runtimeVersion": "V8"
+}
+```
 *global.js*
 ``` javascript
 if (typeof(require) == 'function') {
