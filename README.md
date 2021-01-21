@@ -44,7 +44,7 @@ const
 	.listen(3000, () => console.log('Server start'))
 );
 ```
-###### get iframe content
+###### Get iframe content
 ``` html
 <iframe src="https://httpbin.org/get" frameborder="0" allowfullscreen="true" width="500" height="300" loading="lazy"></iframe>
 <script>
