@@ -24,25 +24,49 @@ npm install js-global-fetch
 ``` javascript
 const { fetch } = require('js-global-fetch');
 fetch('https://httpbin.org/get', {
-    headers: {
+	headers: {
 		'Cors-Cache': 60*60*24*1000,
-        'Cors-Referer': 'https://alex2844.github.io/js-global-fetch/',
-        'Cors-User-Agent': 'globalFetch'
-    }
+		'Cors-Referer': 'https://alex2844.github.io/js-global-fetch/',
+		'Cors-User-Agent': 'globalFetch'
+	}
 })
-    .then(res => res.json())
-    .then(body => console.log(body));
+.then(res => res.json())
+.then(body => console.log(body));
 ```
 ###### CorsProxy as a plugin for Fastify
 ``` javascript
 const
-    Fastify = require('fastify'),
-    { CorsProxy } = require('js-global-fetch');
+	Fastify = require('fastify'),
+	{ CorsProxy } = require('js-global-fetch');
 (Fastify()
-    .register(CorsProxy, { prefix: '/proxy' }) // http://localhost:3000/proxy/
-    .get('/', async (req, rep) => 'Index page') // http://localhost:3000/
-    .listen(3000, () => console.log('Server start'))
+	.register(CorsProxy, { prefix: '/proxy' }) // http://localhost:3000/proxy/
+	.get('/', async (req, rep) => 'Index page') // http://localhost:3000/
+	.listen(3000, () => console.log('Server start'))
 );
+```
+###### get iframe content
+``` html
+<iframe src="https://httpbin.org/get" frameborder="0" allowfullscreen="true" width="500" height="300" loading="lazy"></iframe>
+<script>
+	$('iframe').addEventListener('load', event => {
+		// console.log(event.target.contentWindow.document.body.innerHTML); // Blocked a frame with origin "http://localhost:8080" from accessing a cross-origin frame.
+		new Promise(res => {
+			let onmessage = e_ => {
+				if (e_.data._corsProxy_ && (event.timeStamp == e_.data.timeStamp)) {
+					window.removeEventListener('message', onmessage, false);
+					return res(e_.data._corsProxy_);
+				}
+			}
+			event.target.contentWindow.postMessage({
+				corsProxy: (() => document.body.innerHTML).toString(),
+				timeStamp: event.timeStamp
+			}, '*');
+			window.addEventListener('message', onmessage, false);
+		}).then(html => {
+			console.log(JSON.parse(html.replace(/^(.*?)>/, '').replace(/<(.*?)$/, '')));
+		});
+	}, { once: true });
+</script>
 ```
 
 #### Run cli

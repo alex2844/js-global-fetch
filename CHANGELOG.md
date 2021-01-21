@@ -10,6 +10,10 @@ Security in case of vulnerabilities. (Безопасность в случае �
 
 ## [Unreleased]
 
+## [1.5.1] - 2021-01-21
+### Added
+- Get iframe content
+
 ## [1.5.0] - 2020-10-25
 ### Added
 - Support Google Apps Script
