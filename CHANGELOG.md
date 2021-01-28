@@ -13,6 +13,8 @@ Security in case of vulnerabilities. (Безопасность в случае �
 ## [1.5.1] - 2021-01-21
 ### Added
 - Get iframe content
+### Fixed
+- Check module parent
 
 ## [1.5.0] - 2020-10-25
 ### Added

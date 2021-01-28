@@ -96,7 +96,7 @@ module.exports = {
 	FormData,
 	AbortController
 };
-if (!module.parent)
+if (module.parent === null)
 	module.exports.CorsProxy(require('fastify')()).then(fastify => {
 		fastify.listen((process.env.PORT || 0), () => console.log('Server started http://localhost:'+fastify.server.address().port));
 	});
