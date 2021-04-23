@@ -68,6 +68,8 @@ const
 	}, { once: true });
 </script>
 ```
+###### Open "Youtube on TV"
+https://www.youtube.com/tv?corsProxy={%22user-agent%22:%22Mozilla/%20Chrome/%20Mobile%20Safari/;%20SMART-TV%22}
 
 #### Run cli
 ``` bash
