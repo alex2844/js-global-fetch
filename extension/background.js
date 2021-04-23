@@ -1,7 +1,8 @@
 chrome.storage.local.get({
 	enabled: true,
 	antizapret: false
-}, ps => {
+	// puppeteer: null
+}, /* async */ ps => {
 	let headerFind = (headers, key, value) => {
 		let o = headers.find(({ name }) => name.match(new RegExp(key, 'i')));
 		return (o ? o.value : (value || null));
@@ -18,6 +19,24 @@ chrome.storage.local.get({
 	});
 	if (ps.antizapret)
 		proxy();
+	/*
+	ps.puppeteer = await fetch("http://localhost:9222/json/version").then(res => res.json()).then(data => data.webSocketDebuggerUrl).catch(err => null);
+	chrome.storage.local.set(ps);
+	chrome.contextMenus.create(
+		ps.puppeteer ? {
+			title: 'Puppeteer',
+			type: 'checkbox',
+			checked: true,
+			enabled: false,
+			contexts: [ 'browser_action' ]
+		} : {
+			title: 'Puppeteer',
+			enabled: true,
+			contexts: [ 'browser_action' ],
+			onclick: () => alert('Add --remote-debugging-port=9222 to the end of the target field of your chrome.exe short cut.')
+		}
+	);
+	*/
 	chrome.contextMenus.create({
 		title: 'Enable cors',
 		type: 'checkbox',

@@ -10,6 +10,12 @@ Security in case of vulnerabilities. (Безопасность в случае �
 
 ## [Unreleased]
 
+## [1.6.1] - 2021-04-23
+### Fixed
+- JS detect ua
+- JS detect referer
+- only contentType == text/html
+
 ## [1.5.1] - 2021-01-21
 ### Added
 - Get iframe content
