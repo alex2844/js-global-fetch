@@ -33,18 +33,22 @@ self.addEventListener('fetch', async event => {
 								headers[h[0]] = h[1];
 						}
 						for (let h of req.headers.entries()) {
-							if (h[0].match(/^cors-/i) && ((h[0] = h[0].replace(/^cors-/i, '')) != 'cache')) {
+							if (h[0].match(/^cors-/i) && ([ 'cache' /* , 'redirect' */ ].indexOf(h[0] = h[0].replace(/^cors-/i, '')) == -1)) {
 								if (h[1] && (h[1] != 'null'))
 									headers[h[0]] = h[1];
 								else
 									delete headers[h[0]];
 							}
 						}
+                        let hh = JSON.parse(Object.fromEntries(new URLSearchParams(url.search)).corsProxy || '{}');
+                        for (let h in hh) {
+                            headers[h] = hh[h];
+                        }
 					}
 					let get = await fetch((url.pathname.startsWith('/http') ? req.url.slice(url.origin.length + 1) : url.href), {
 						method: req.method,
 						headers: headers,
-						redirect: 'follow',
+						redirect: 'follow', // (req.headers.get('Cors-Redirect') || 'follow'),
 						body: req.body
 					});
 					res = new Response(get.body, get);
@@ -61,6 +65,8 @@ self.addEventListener('fetch', async event => {
 				res.headers.set('Cache-control', 'public');
 				res.headers.set('Expires', new Date(Date.now() + parseInt(req.headers.get('Cors-Cache'))).toUTCString());
 			}
+			// if (req.headers.get('Cors-Redirect'))
+				// res.headers.delete('Location');
 		} catch (e) {
 			res = new Response((e.stack || e), { status: 500 });
 		}
