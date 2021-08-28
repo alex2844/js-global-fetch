@@ -52,13 +52,15 @@ const
 		// console.log(event.target.contentWindow.document.body.innerHTML); // Blocked a frame with origin "http://localhost:8080" from accessing a cross-origin frame.
 		new Promise(res => {
 			let onmessage = e_ => {
-				if (e_.data._corsProxy_ && (event.timeStamp == e_.data.timeStamp)) {
+				if (e_.data.corsProxy && (event.timeStamp == e_.data.timeStamp)) {
 					window.removeEventListener('message', onmessage, false);
 					return res(e_.data._corsProxy_);
 				}
 			}
 			event.target.contentWindow.postMessage({
-				corsProxy: (() => document.body.innerHTML).toString(),
+				corsProxy: {
+					eval: (() => document.body.innerHTML).toString()
+				},
 				timeStamp: event.timeStamp
 			}, '*');
 			window.addEventListener('message', onmessage, false);
