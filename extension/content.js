@@ -40,7 +40,7 @@ if (document.contentType == 'text/html') {
 				if (res.webRequest && !!webRequests)
 					webRequests.push(res.webRequest);
 			});
-			window.addEventListener('message', event => {
+			window.addEventListener('message', async event => {
 				if (event.data.corsProxy && !event.data.runtime) {
 					let res = {};
 					if ((event.data.corsProxy.webRequests != undefined) || !!webRequests) {
@@ -50,8 +50,11 @@ if (document.contentType == 'text/html') {
 						else if ((event.data.corsProxy.webRequests == false) && !!webRequests)
 							webRequests = null;
 					}
-					if (event.data.corsProxy.eval)
+					if (event.data.corsProxy.eval) {
 						res.eval = new Function('return ('+event.data.corsProxy.eval+')()')();
+						if (res.eval && (res.eval.constructor.name == 'Promise'))
+							res.eval = await res.eval;
+					}
 					event.source.postMessage({
 						corsProxy: res,
 						timeStamp: event.data.timeStamp,
