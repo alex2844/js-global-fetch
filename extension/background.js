@@ -106,15 +106,19 @@ chrome.storage.local.get({
 	}, [
 		'blocking', 'requestHeaders', 'extraHeaders'
 	]);
-	chrome.webRequest.onHeadersReceived.addListener(({ responseHeaders }) => (!ps.enabled ? {} : {
-		responseHeaders: responseHeaders.concat([
-			{ name: 'Access-Control-Allow-Origin', value: headerFind(responseHeaders, 'access-control-allow-origin', '*') },
-			{ name: 'Access-Control-Allow-Methods', value: headerFind(responseHeaders, 'access-control-allow-methods', '*') },
-			{ name: 'Access-Control-Allow-Headers', value: headerFind(responseHeaders, 'access-control-allow-headers', '*') },
-			{ name: 'Access-Control-Expose-Headers', value: '*' },
-			{ name: 'Access-Control-Allow-Credentials', value: 'true' }
-		])
-	}), {
+	chrome.webRequest.onHeadersReceived.addListener(e => {
+		chrome.tabs.sendMessage(e.tabId, { webRequest: e }); 
+		let responseHeaders = e.responseHeaders;
+		return (!ps.enabled ? {} : {
+			responseHeaders: responseHeaders.concat([
+				{ name: 'Access-Control-Allow-Origin', value: headerFind(responseHeaders, 'access-control-allow-origin', '*') },
+				{ name: 'Access-Control-Allow-Methods', value: headerFind(responseHeaders, 'access-control-allow-methods', '*') },
+				{ name: 'Access-Control-Allow-Headers', value: headerFind(responseHeaders, 'access-control-allow-headers', '*') },
+				{ name: 'Access-Control-Expose-Headers', value: '*' },
+				{ name: 'Access-Control-Allow-Credentials', value: 'true' }
+			])
+		});
+	}, {
 		urls: [	'<all_urls>' ]
 	}, [
 		'blocking', 'responseHeaders'

@@ -35,12 +35,29 @@ if (document.contentType == 'text/html') {
 				id: chrome.runtime.id,
 				name, version, config
 			}));
+			let webRequests;
+			chrome.runtime.onMessage.addListener(res => {
+				if (res.webRequest && !!webRequests)
+					webRequests.push(res.webRequest);
+			});
 			window.addEventListener('message', event => {
-				if (event.data.corsProxy)
+				if (event.data.corsProxy && !event.data.runtime) {
+					let res = {};
+					if ((event.data.corsProxy.webRequests != undefined) || !!webRequests) {
+						res.webRequests = webRequests;
+						if ((event.data.corsProxy.webRequests == true) && !webRequests)
+							webRequests = [];
+						else if ((event.data.corsProxy.webRequests == false) && !!webRequests)
+							webRequests = null;
+					}
+					if (event.data.corsProxy.eval)
+						res.eval = new Function('return ('+event.data.corsProxy.eval+')()')();
 					event.source.postMessage({
-						_corsProxy_: new Function('return ('+event.data.corsProxy+')()')(),
-						timeStamp: event.data.timeStamp
+						corsProxy: res,
+						timeStamp: event.data.timeStamp,
+						runtime: true
 					}, '*');
+				}
 			});
 		}
 	});

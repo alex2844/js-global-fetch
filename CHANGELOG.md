@@ -10,6 +10,10 @@ Security in case of vulnerabilities. (Безопасность в случае �
 
 ## [Unreleased]
 
+## [1.6.2] - 2021-08-28
+### Added
+- Get iframe webRequests
+
 ## [1.6.1] - 2021-04-23
 ### Fixed
 - JS detect ua
