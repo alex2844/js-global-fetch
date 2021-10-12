@@ -1,43 +1,21 @@
-chrome.storage.local.get({
-	enabled: true,
-	antizapret: false
-	// puppeteer: null
-}, /* async */ ps => {
-	let headerFind = (headers, key, value) => {
-		let o = headers.find(({ name }) => name.match(new RegExp(key, 'i')));
-		return (o ? o.value : (value || null));
-	}
-	let proxy = () => chrome.proxy.settings.set({
-		value: (!ps.antizapret ? { mode: 'system' } : {
-			mode: 'pac_script',
-			pacScript: {
-				url: 'https://antizapret.prostovpn.org/proxy.pac',
-				mandatory: true
-			}
-		}),
-		scope: 'regular'
-	});
-	if (ps.antizapret)
-		proxy();
-	/*
-	ps.puppeteer = await fetch("http://localhost:9222/json/version").then(res => res.json()).then(data => data.webSocketDebuggerUrl).catch(err => null);
-	chrome.storage.local.set(ps);
-	chrome.contextMenus.create(
-		ps.puppeteer ? {
-			title: 'Puppeteer',
-			type: 'checkbox',
-			checked: true,
-			enabled: false,
-			contexts: [ 'browser_action' ]
-		} : {
-			title: 'Puppeteer',
-			enabled: true,
-			contexts: [ 'browser_action' ],
-			onclick: () => alert('Add --remote-debugging-port=9222 to the end of the target field of your chrome.exe short cut.')
+let config;
+let headerFind = (headers, key, value) => {
+	let o = headers.find(({ name }) => name.match(new RegExp(key, 'i')));
+	return (o ? o.value : (value || null));
+}
+let proxy = () => chrome.proxy.settings.set({
+	value: (!config.antizapret ? { mode: 'system' } : {
+		mode: 'pac_script',
+		pacScript: {
+			url: 'https://antizapret.prostovpn.org/proxy.pac',
+			mandatory: true
 		}
-	);
-	*/
-	chrome.contextMenus.create({
+	}),
+	scope: 'regular'
+});
+let menu = {
+	cors: ps => ({
+		id: 'cors',
 		title: 'Enable cors',
 		type: 'checkbox',
 		checked: ps.enabled,
@@ -45,19 +23,24 @@ chrome.storage.local.get({
 		onclick: ({ checked }) => {
 			ps.enabled = checked;
 			chrome.storage.local.set(ps);
+			if (!ps)
+				chrome.contextMenus.update('cors', { checked })
 		}
-	});
-	chrome.contextMenus.create({
+	}),
+	antizapret: ps => ({
+		id: 'antizapret',
 		title: 'Antizapret',
 		type: 'checkbox',
-		checked: ps.antizapret,
+		checked: (ps || config).antizapret,
 		contexts: [ 'browser_action' ],
 		onclick: ({ checked }) => {
-			proxy(ps.antizapret = checked);
-			chrome.storage.local.set(ps);
+			proxy((ps || config).antizapret = checked);
+			chrome.storage.local.set(ps || config);
+			if (!ps)
+				chrome.contextMenus.update('antizapret', { checked })
 		}
-	});
-	chrome.contextMenus.create({
+	}),
+	cookies: ps => ({
 		title: 'Save cookies',
 		contexts: [ 'browser_action' ],
 		onclick: () => chrome.tabs.getSelected(null, tab => chrome.cookies.getAll({
@@ -83,7 +66,35 @@ chrome.storage.local.get({
 				].join('\t'))).join('\n')
 			], { type: 'text/plain;charset=utf-8' }))
 		})))
-	});
+	})
+};
+chrome.storage.local.get({
+	enabled: true,
+	antizapret: false
+	// puppeteer: null
+}, /* async */ ps => {
+	config = ps;
+	if (ps.antizapret)
+		proxy();
+	/*
+	ps.puppeteer = await fetch("http://localhost:9222/json/version").then(res => res.json()).then(data => data.webSocketDebuggerUrl).catch(err => null);
+	chrome.storage.local.set(ps);
+	chrome.contextMenus.create(
+		ps.puppeteer ? {
+			title: 'Puppeteer',
+			type: 'checkbox',
+			checked: true,
+			enabled: false,
+			contexts: [ 'browser_action' ]
+		} : {
+			title: 'Puppeteer',
+			enabled: true,
+			contexts: [ 'browser_action' ],
+			onclick: () => alert('Add --remote-debugging-port=9222 to the end of the target field of your chrome.exe short cut.')
+		}
+	);
+	*/
+	Object.values(menu).forEach(m => chrome.contextMenus.create(m(ps)));
 	chrome.webRequest.onBeforeSendHeaders.addListener(({ url, requestHeaders }) => (!ps.enabled ? {} : {
 		requestHeaders: requestHeaders.map(h => {
 			let i, k;
