@@ -10,6 +10,10 @@ Security in case of vulnerabilities. (Безопасность в случае �
 
 ## [Unreleased]
 
+## [1.6.5] - 2021-10-14
+### Added
+- background.html
+
 ## [1.6.4] - 2021-10-12
 ### Added
 - public background.menu && background.config

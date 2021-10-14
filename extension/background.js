@@ -20,10 +20,10 @@ let menu = {
 		type: 'checkbox',
 		checked: ps.enabled,
 		contexts: [ 'browser_action' ],
-		onclick: ({ checked }) => {
+		onclick: ({ checked, update }) => {
 			ps.enabled = checked;
 			chrome.storage.local.set(ps);
-			if (!ps)
+			if (!ps || update)
 				chrome.contextMenus.update('cors', { checked })
 		}
 	}),
@@ -33,10 +33,10 @@ let menu = {
 		type: 'checkbox',
 		checked: (ps || config).antizapret,
 		contexts: [ 'browser_action' ],
-		onclick: ({ checked }) => {
+		onclick: ({ checked, update }) => {
 			proxy((ps || config).antizapret = checked);
 			chrome.storage.local.set(ps || config);
-			if (!ps)
+			if (!ps || update)
 				chrome.contextMenus.update('antizapret', { checked })
 		}
 	}),
@@ -74,64 +74,89 @@ chrome.storage.local.get({
 	// puppeteer: null
 }, /* async */ ps => {
 	config = ps;
-	if (ps.antizapret)
-		proxy();
-	/*
-	ps.puppeteer = await fetch("http://localhost:9222/json/version").then(res => res.json()).then(data => data.webSocketDebuggerUrl).catch(err => null);
-	chrome.storage.local.set(ps);
-	chrome.contextMenus.create(
-		ps.puppeteer ? {
-			title: 'Puppeteer',
-			type: 'checkbox',
-			checked: true,
-			enabled: false,
-			contexts: [ 'browser_action' ]
-		} : {
-			title: 'Puppeteer',
-			enabled: true,
-			contexts: [ 'browser_action' ],
-			onclick: () => alert('Add --remote-debugging-port=9222 to the end of the target field of your chrome.exe short cut.')
-		}
-	);
-	*/
-	Object.values(menu).forEach(m => chrome.contextMenus.create(m(ps)));
-	chrome.webRequest.onBeforeSendHeaders.addListener(({ url, requestHeaders }) => (!ps.enabled ? {} : {
-		requestHeaders: requestHeaders.map(h => {
-			let i, k;
-			if (h.name.match(/^cors-/i) && (k = h.name.replace(/^cors-/i, ''))) {
-				if ((i = requestHeaders.findIndex(h_ => h_.name.match(new RegExp('^'+k+'$', 'i')))) > -1)
-					requestHeaders[i].value = null;
-				return { name: k, value: ((h.value == 'null') ? h.value : null) };
+	Object.entries(chrome.runtime.getManifest().config || {}).forEach(e => (ps[e[0]] = e[1])); // fetch('chrome://version/strings.js')
+	if (!location.href.endsWith('background.html')) {
+		if (ps.antizapret)
+			proxy();
+		/*
+		ps.puppeteer = await fetch("http://localhost:9222/json/version").then(res => res.json()).then(data => data.webSocketDebuggerUrl).catch(err => null);
+		chrome.storage.local.set(ps);
+		chrome.contextMenus.create(
+			ps.puppeteer ? {
+				title: 'Puppeteer',
+				type: 'checkbox',
+				checked: true,
+				enabled: false,
+				contexts: [ 'browser_action' ]
+			} : {
+				title: 'Puppeteer',
+				enabled: true,
+				contexts: [ 'browser_action' ],
+				onclick: () => alert('Add --remote-debugging-port=9222 to the end of the target field of your chrome.exe short cut.')
 			}
-			return h;
-		})
-		// .filter(h => (h.value && (h.value != 'null')))
-		.filter(Boolean)
-		.concat(Object.entries(
-			JSON.parse(Object.fromEntries(new URLSearchParams('?'+url.split('?')[1])).corsProxy || '{}')
-		).map(h => ({
-			name: h[0], value: h[1]
-		})))
-	}), {
-		urls: [	'<all_urls>' ]
-	}, [
-		'blocking', 'requestHeaders', 'extraHeaders'
-	]);
-	chrome.webRequest.onHeadersReceived.addListener(e => {
-		chrome.tabs.sendMessage(e.tabId, { webRequest: e }); 
-		let responseHeaders = e.responseHeaders;
-		return (!ps.enabled ? {} : {
-			responseHeaders: responseHeaders.concat([
-				{ name: 'Access-Control-Allow-Origin', value: headerFind(responseHeaders, 'access-control-allow-origin', '*') },
-				{ name: 'Access-Control-Allow-Methods', value: headerFind(responseHeaders, 'access-control-allow-methods', '*') },
-				{ name: 'Access-Control-Allow-Headers', value: headerFind(responseHeaders, 'access-control-allow-headers', '*') },
-				{ name: 'Access-Control-Expose-Headers', value: '*' },
-				{ name: 'Access-Control-Allow-Credentials', value: 'true' }
-			])
+		);
+		*/
+		Object.values(menu).forEach(m => chrome.contextMenus.create(m(ps)));
+		chrome.webRequest.onBeforeSendHeaders.addListener(({ url, requestHeaders }) => (!ps.enabled ? {} : {
+			requestHeaders: requestHeaders.map(h => {
+				let i, k;
+				if (h.name.match(/^cors-/i) && (k = h.name.replace(/^cors-/i, ''))) {
+					if ((i = requestHeaders.findIndex(h_ => h_.name.match(new RegExp('^'+k+'$', 'i')))) > -1)
+						requestHeaders[i].value = null;
+					return { name: k, value: ((h.value == 'null') ? h.value : null) };
+				}
+				return h;
+			})
+			// .filter(h => (h.value && (h.value != 'null')))
+			.filter(Boolean)
+			.concat(Object.entries(
+				JSON.parse(Object.fromEntries(new URLSearchParams('?'+url.split('?')[1])).corsProxy || '{}')
+			).map(h => ({
+				name: h[0], value: h[1]
+			})))
+		}), {
+			urls: [	'<all_urls>' ]
+		}, [
+			'blocking', 'requestHeaders', 'extraHeaders'
+		]);
+		chrome.webRequest.onHeadersReceived.addListener(e => {
+			chrome.tabs.sendMessage(e.tabId, { webRequest: e }); 
+			let responseHeaders = e.responseHeaders;
+			return (!ps.enabled ? {} : {
+				responseHeaders: responseHeaders.concat([
+					{ name: 'Access-Control-Allow-Origin', value: headerFind(responseHeaders, 'access-control-allow-origin', '*') },
+					{ name: 'Access-Control-Allow-Methods', value: headerFind(responseHeaders, 'access-control-allow-methods', '*') },
+					{ name: 'Access-Control-Allow-Headers', value: headerFind(responseHeaders, 'access-control-allow-headers', '*') },
+					{ name: 'Access-Control-Expose-Headers', value: '*' },
+					{ name: 'Access-Control-Allow-Credentials', value: 'true' }
+				])
+			});
+		}, {
+			urls: [	'<all_urls>' ]
+		}, [
+			'blocking', 'responseHeaders'
+		]);
+		chrome.browserAction.onClicked.addListener(() => {
+			chrome.windows.create({
+				url: chrome.runtime.getURL('background.html'),
+				type: 'popup',
+				height: 330,
+				width: 250
+			})
 		});
-	}, {
-		urls: [	'<all_urls>' ]
-	}, [
-		'blocking', 'responseHeaders'
-	]);
+	}else{
+		let content = document.querySelector('main section');
+		Object.values(menu).map(m => m(ps)).forEach(m => {
+			let tpl = document.createElement('template');
+			if (m.type == 'checkbox')
+				tpl.innerHTML = '<label class="checkbox"><input type="checkbox" '+(m.checked ? 'checked' : '')+'><span>'+m.title+'</span></label>';
+			else
+				tpl.innerHTML = '<label class="button"><input type="button" value="'+m.title+'"/></label>';
+			tpl.content.querySelector('input').addEventListener('click', event => m.onclick({
+				update: true,
+				checked: event.target.checked
+			}));
+			content.append(tpl.content);
+		});
+	}
 });
