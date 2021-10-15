@@ -1,6 +1,6 @@
 {
 	"name": "js-global-fetch",
-	"version": "1.6.5",
+	"version": "1.6.6",
 	"description": "Universal Fetch API, FormData, AbortController, CorsProxy for Nodejs, Browsers and Google Apps Script",
 	"main": "globalFetch.js",
 	"module": "dist/polyfill.js",
