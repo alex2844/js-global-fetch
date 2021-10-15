@@ -1,6 +1,6 @@
 {
 	"manifest_version": 2,
-	"version": "1.6.5",
+	"version": "1.6.6",
 	"name": "CorsProxy",
 	"description": "corsProxy lets you easily perform cross-domain Ajax requests in web applications.",
 	"permissions": [ "proxy", "tabs", "downloads", "cookies", "storage", "file://*/*", "<all_urls>", "webRequest", "webRequestBlocking", "contextMenus" ],
